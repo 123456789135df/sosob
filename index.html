@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -191,7 +192,7 @@
       <h1 class="brand">소분소분 지원서</h1>
       <p class="sub">한 주 반찬 걱정을 같이 줄여봐요. 아래 항목을 채워서 제출하면 지원이 완료됩니다.</p>
     </div>
-    <nav class="top"><a href="https://halcyon08280.github.io/foodarchive/">← 1기 아카이브 보기</a></nav>
+    <nav class="top"><a href="archive.html">← 1기 아카이브 보기</a></nav>
   </div>
 </header>
 
@@ -340,13 +341,15 @@
     submitBtn.textContent = '제출 중...';
 
     try {
-      // Apps Script 웹 앱은 CORS 프리플라이트를 피하기 위해
-      // text/plain 으로 JSON 문자열을 보냅니다.
+      // FormData로 전송: 커스텀 헤더가 없어서 브라우저가 자동으로
+      // multipart/form-data로 보내고, Apps Script가 e.parameter로 안정적으로 받습니다.
+      const formData = new FormData();
+      Object.entries(payload).forEach(([key, value]) => formData.append(key, value));
+
       await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+        body: formData
       });
 
       // no-cors 모드에서는 응답 내용을 읽을 수 없어 성공으로 간주합니다.
